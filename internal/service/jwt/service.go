@@ -7,13 +7,13 @@ import (
 )
 
 type jwtService struct {
-	cfg    *config.Authentication
-	logger *logger.Logger
+	cfg    config.Authentication
+	logger logger.Logger
 }
 
 func New(cfg config.Authentication, logger logger.Logger) service2.Authentication {
 	return jwtService{
-		cfg:    &cfg,
-		logger: &logger,
+		cfg:    cfg,
+		logger: logger,
 	}
 }

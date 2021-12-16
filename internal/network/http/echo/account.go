@@ -10,22 +10,26 @@ import (
 )
 
 type handler struct {
-	logger         logger.Logger
-	accountService service.Account
-	ticketService  service.Ticket
+	logger                logger.Logger
+	accountService        service.Account
+	ticketService         service.Ticket
+	authenticationService service.Authentication
+	validationService     service.Validation
 }
 
 func (h *handler) login(c echo.Context) error {
-	// start span with context
+	var req request.Login
 
-	req := new(request.Login)
-
-	if err := c.Bind(req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		h.logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
 	}
 
-	token, err := h.accountService.Login(c.Request().Context(), req.Username, req.Password)
+	if err := h.validationService.LoginRequest(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+	}
+
+	token, err := h.accountService.Login(req.Username, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
 	}
@@ -34,9 +38,24 @@ func (h *handler) login(c echo.Context) error {
 }
 
 func (h *handler) register(c echo.Context) error {
-	return nil
-}
+	var req request.Register
 
-func (h *handler) registerConfirm(c echo.Context) error {
-	return nil
+	if err := c.Bind(&req); err != nil {
+		h.logger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+	}
+
+	if err := h.validationService.RegisterRequest(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+	}
+
+	err := h.accountService.Register(req.Username, req.Password)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
+	}
+
+	return c.JSON(http.StatusOK, response.Register{
+		Message: "User Successfully Registered",
+		Status:  200,
+	})
 }

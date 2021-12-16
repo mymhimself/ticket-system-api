@@ -10,4 +10,9 @@ type (
 		Error  string `json:"error"`
 		Status int    `json:"status"`
 	}
+
+	Register struct {
+		Message string `json:"message"`
+		Status  int    `json:"status"`
+	}
 )

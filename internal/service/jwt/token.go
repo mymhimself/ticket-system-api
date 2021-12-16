@@ -2,7 +2,9 @@ package jwt
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/mymhimself/ticket-system-api/internal/entity/enum"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
+	"github.com/mymhimself/ticket-system-api/internal/pkg/myerror"
 	"time"
 )
 
@@ -16,10 +18,12 @@ func (a jwtService) GenerateToken(user *model.User) (string, error) {
 		},
 	}
 
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodES256, claim)
-	signedToken, err := jwtToken.SignedString(a.cfg.Secret)
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+
+	signedToken, err := jwtToken.SignedString([]byte(a.cfg.Secret))
 	if err != nil {
-		return "", err
+		a.logger.Error(err.Error())
+		return "", myerror.New(myerror.InternalError, enum.ServiceLayer, err.Error())
 	} else {
 		return signedToken, nil
 	}

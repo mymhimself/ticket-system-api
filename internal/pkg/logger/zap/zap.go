@@ -31,6 +31,8 @@ func (l *log) Sync() {
 }
 
 func (l *log) Error(msg string, kv ...interface{}) {
+	//keyValue := make(map[string]string)
+	//keyValue["traceError"] = l.trace()
 	l.zap.Errorw(msg, kv...)
 }
 

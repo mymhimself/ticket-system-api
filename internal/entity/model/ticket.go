@@ -5,10 +5,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type Ticket struct {
-	Sender   User
-	Text     string
-	Title    string
-	Priority enum.Priority
-	gorm.Model
-}
+type (
+	Ticket struct {
+		Sender          User
+		SenderID        uint
+		Status          enum.TicketStatus
+		Text            string
+		Title           string
+		Priority        enum.Priority
+		ReplyToTicketID uint
+		gorm.Model
+	}
+)

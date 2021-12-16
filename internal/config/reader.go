@@ -1,27 +1,26 @@
 package config
 
 import (
+	"encoding/json"
 	"os"
-
-	"gopkg.in/yaml.v2"
 )
 
-func ReadYAML(path string, cfg *Config) (err error) {
-	file, err := os.Open(path)
+func ReadJSON(path string) (*Config, error) {
+	var config ConfigurationType
+	configFile, err := os.Open(path)
+	defer configFile.Close()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	defer func() {
-		if e := file.Close(); err == nil {
-			err = e
-		}
-	}()
-
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(cfg); err != nil {
-		return err
+	jsonParser := json.NewDecoder(configFile)
+	if err := jsonParser.Decode(&config); err != nil {
+		return nil, err
 	}
 
-	return nil
+	if config.IsProd {
+		return &config.Prod, nil
+	} else {
+		return &config.Dev, nil
+	}
 }

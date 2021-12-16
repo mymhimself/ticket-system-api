@@ -6,10 +6,9 @@ import (
 )
 
 type User struct {
-	Username        string //email
-	Phone           string
-	PhoneIsVerified bool
-	Password        string
-	Role            enum.Role
+	Username       string //email
+	HashedPassword []byte `gorm:"type:bytea"` //postgres type: bytea (byte array)
+	Salt           string
+	Role           enum.Role
 	gorm.Model
 }

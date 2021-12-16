@@ -2,8 +2,6 @@ package echo
 
 import (
 	"context"
-	"github.com/casbin/casbin/v2"
-	casbinMw "github.com/labstack/echo-contrib/casbin"
 	"github.com/mymhimself/ticket-system-api/internal/config"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
 	"github.com/mymhimself/ticket-system-api/internal/network"
@@ -24,10 +22,10 @@ type httpImpl struct { //REST
 	user    *echo.Group
 }
 
-func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account) network.Rest {
+func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account, ticketSrv service.Ticket, validation service.Validation) network.Rest {
 	echoInstance := echo.New()
-	enforcer, _ := casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")
-	echoInstance.Use(casbinMw.Middleware(enforcer))
+	//enforcer, _ := casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")
+	//echoInstance.Use(casbinMw.Middleware(enforcer))
 	echoInstance.Use(middleware.Gzip())
 	echoInstance.Use(middleware.RequestID())
 	echoInstance.Use(middleware.Recover())
@@ -45,20 +43,24 @@ func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account
 			}
 		},
 	}
+	//echoInstance.Use(middleware.JWTWithConfig(jwtConfig))
+
 	public := echoInstance.Group("")
 	admin := echoInstance.Group("/admin", middleware.JWTWithConfig(jwtConfig))
 	user := echoInstance.Group("/user", middleware.JWTWithConfig(jwtConfig))
-
 	var httpInstance = &httpImpl{
 		echo:   echoInstance,
 		public: public,
 		admin:  admin,
 		user:   user,
 		handler: &handler{
-			logger:         logger,
-			accountService: accSrv,
+			logger:                logger,
+			accountService:        accSrv,
+			ticketService:         ticketSrv,
+			authenticationService: nil,
+			validationService:     validation,
 		}}
-	httpInstance.setRouting()
+
 	return httpInstance
 }
 
@@ -71,7 +73,7 @@ func (r *httpImpl) Start(address string) error {
 }
 
 func (r *httpImpl) Shutdown() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // use config for time
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	return r.echo.Shutdown(ctx)
