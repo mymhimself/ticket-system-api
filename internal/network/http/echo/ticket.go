@@ -88,3 +88,80 @@ func (h *handler) replyToTicketMessage(ctx echo.Context) error {
 		)
 	}
 }
+
+func (h *handler) replyToTicketMessageAsAdmin(ctx echo.Context) error {
+	var body request.ReplyTicket
+
+	//body extraction process
+	if err := ctx.Bind(&body); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.Error{
+			Error:  "bad request format",
+			Status: http.StatusBadRequest},
+		)
+	} else {
+		//validation process
+		if err := h.validationService.ReplyTicketRequest(&body); err != nil {
+			return ctx.JSON(http.StatusBadRequest, response.Error{
+				Error:  err.Error(),
+				Status: http.StatusBadRequest,
+			})
+		} else {
+			_, senderID := extractUserInfoFromToken(ctx)
+			err := h.ticketService.ReplyMessageAsAdmin(body.Text, body.ReplyTo, senderID)
+			if err != nil {
+				return ctx.JSON(http.StatusBadRequest, response.Error{
+					Error:  err.Error(),
+					Status: http.StatusBadRequest,
+				})
+			}
+
+		}
+		return ctx.JSON(
+			http.StatusOK,
+			response.NewTicket{
+				Message: "Message saved.",
+				Status:  http.StatusOK,
+			},
+		)
+	}
+}
+
+func (h *handler) ticketList(ctx echo.Context) error {
+	var body request.FilterTicket
+	//body extraction process
+	if err := ctx.Bind(&body); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.Error{
+			Error:  "bad request format",
+			Status: http.StatusBadRequest},
+		)
+	}
+
+	if body.Seen != nil {
+		fmt.Println(*body.Seen)
+	}
+
+	_, senderID := extractUserInfoFromToken(ctx)
+	list, err := h.ticketService.GetFilteredTicketThreads(
+		senderID,
+		body.Seen,
+		body.Status,
+		body.Replied,
+		body.Priority,
+		body.Department,
+	)
+
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.Error{
+			Error:  err.Error(),
+			Status: http.StatusBadRequest,
+		})
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		response.TicketInfo{
+			Status: http.StatusOK,
+			List:   list,
+		},
+	)
+}

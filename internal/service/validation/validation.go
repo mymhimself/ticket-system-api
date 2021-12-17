@@ -41,6 +41,16 @@ func (s *validationImpl) NewTicketRequest(requestBody *request.NewTicket) error 
 	return err
 }
 
+//func (s *validationImpl) FilterTicketRequest(requestBody *request.FilterTicket) err {
+//	err := validation.ValidateStruct(requestBody,
+//		validation.Field(&requestBody.Text, validation.Required, validation.Length(10, 400)),
+//		validation.Field(&requestBody.Title, validation.Required, validation.Length(10, 80)),
+//		validation.Field(&requestBody.Priority, validation.Required, validation.Max(4), validation.Min(0)),
+//		validation.Field(&requestBody.Department, validation.Required, validation.Min(1)),
+//	)
+//	return err
+//}
+
 func (s *validationImpl) ReplyTicketRequest(requestBody *request.ReplyTicket) error {
 	err := validation.ValidateStruct(requestBody,
 		validation.Field(&requestBody.Text, validation.Required, validation.Length(10, 400)),

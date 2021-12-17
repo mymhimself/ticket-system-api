@@ -26,4 +26,6 @@ type Postgres interface {
 	GetUserTickets(userID uint, status enum.TicketThreadStatus) ([]model.Ticket, error)
 	GetAllTickets(status enum.TicketThreadStatus) ([]model.Ticket, error)
 	GetTicketMessageByID(id uint) (*model.TicketMessage, bool, error)
+	GetOpenTicketThreadsList() ([]model.TicketThread, error)
+	GetUserTicketThreadListByFilter(userID uint, filterParams map[string]interface{}) ([]model.TicketInfo, error)
 }

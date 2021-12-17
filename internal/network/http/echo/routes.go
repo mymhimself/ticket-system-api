@@ -13,4 +13,5 @@ func (r *httpImpl) setRouting() {
 	//ticket routes
 	r.user.POST(apiV1+"/ticket", r.handler.createNewTicket)
 	r.user.PUT(apiV1+"/ticket", r.handler.replyToTicketMessage)
+	r.user.GET(apiV1+"/tickets", r.handler.ticketList)
 }

@@ -7,6 +7,7 @@ const (
 	InternalError
 	PasswordIncorrect
 	TicketMessageNotFound
+	UnassignedTicketErr
 	TicketIsClosed
 	TicketNotFound
 	InvalidPasswordLength
@@ -28,6 +29,7 @@ var stringMap map[ErrorCode]string = map[ErrorCode]string{
 	UserSuccessfullyRegistered: "user successfully registered",
 	InvalidPriorityValue:       "invalid priority value",
 	InvalidDepartmentValue:     "invalid department value",
+	UnassignedTicketErr:        "un assigned ticket error",
 }
 
 func (e ErrorCode) String() string {
