@@ -29,12 +29,12 @@ func (h *handler) login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
 	}
 
-	token, err := h.accountService.Login(req.Username, req.Password)
+	token, refreshToken, err := h.accountService.Login(req.Username, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
 	}
 
-	return c.JSON(http.StatusOK, response.Login{Token: token, Status: http.StatusOK})
+	return c.JSON(http.StatusOK, response.Login{RefreshToken: refreshToken, AccessToken: token, Status: http.StatusOK})
 }
 
 func (h *handler) register(c echo.Context) error {
@@ -49,13 +49,15 @@ func (h *handler) register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
 	}
 
-	err := h.accountService.Register(req.Username, req.Password)
+	accessToken, refreshToken, err := h.accountService.Register(req.Username, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
 	}
 
 	return c.JSON(http.StatusOK, response.Register{
-		Message: "User Successfully Registered",
-		Status:  200,
+		Message:      "User Successfully Registered",
+		Status:       200,
+		RefreshToken: refreshToken,
+		AccessToken:  accessToken,
 	})
 }

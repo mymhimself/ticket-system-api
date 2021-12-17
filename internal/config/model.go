@@ -39,9 +39,9 @@ type (
 	}
 
 	Authentication struct {
-		Secret            string `json:"secret"`
-		TokenExpireTime   int    `json:"token_expire_time"`
-		RefreshExpireTime int    `json:"refresh_expire_time"`
+		Secret                 string `json:"secret"`
+		AccessTokenExpireTime  int    `json:"access_token_expire_time"`  //in minutes
+		RefreshTokenExpireTime int    `json:"refresh_token_expire_time"` //in minutes
 	}
 
 	DataProtocol struct {

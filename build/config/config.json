@@ -3,14 +3,16 @@
     "app": {
       "port": ":8081"
     },
-    "authorization":{
+    "authorization": {
       "casbin": {
         "model_path": "casbin/casbin_auth_policy.csv",
         "policy_path": "casbin/casbin_auth_model.conf"
       }
     },
     "authentication": {
-        "secret": "alskdjfalsdjfaweoir98324798"
+      "secret": "alskdjfal87sdjXfaweoUIO8324798",
+      "access_token_expire_time": 10,
+      "refresh_token_expire_time": 43200
     },
     "database": {
       "postgres": {
@@ -25,13 +27,12 @@
         "auto_migration": true
       }
     },
-    "server" : {
-      "port": 8081
-    },
     "data_protocol": {
       "page_size": 10
     }
   },
-  "prod": {},
+  "prod": {
+
+  },
   "is_prod": false
 }

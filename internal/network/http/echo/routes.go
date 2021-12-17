@@ -1,10 +1,16 @@
 package echo
 
-func (r *httpImpl) setRouting() {
-	r.public.GET("/api/v1/ping", r.handler.Ping)
-	r.public.POST("/api/v1/login", r.handler.login)
-	r.public.POST("/api/v1/register", r.handler.register)
+const apiV1 = "/api/v1"
 
-	r.user.GET("/api/v1/token/refresh/:id", r.handler.refreshToken) //user id
-	r.user.POST("/api/v1/ticket", r.handler.newTicket)
+func (r *httpImpl) setRouting() {
+	r.public.GET(apiV1+"/ping", r.handler.Ping)
+	r.user.GET(apiV1+"/token/refresh/:id", r.handler.refreshToken) //user id
+
+	//account routes
+	r.public.POST(apiV1+"/login", r.handler.login)
+	r.public.POST(apiV1+"/register", r.handler.register)
+
+	//ticket routes
+	r.user.POST(apiV1+"/ticket", r.handler.createNewTicket)
+	r.user.PUT(apiV1+"/ticket", r.handler.replyToTicketMessage)
 }

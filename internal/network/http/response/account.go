@@ -2,8 +2,9 @@ package response
 
 type (
 	Login struct {
-		Token  string `json:"token"`
-		Status int    `json:"status"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+		Status       int    `json:"status"`
 	}
 
 	Error struct {
@@ -12,7 +13,9 @@ type (
 	}
 
 	Register struct {
-		Message string `json:"message"`
-		Status  int    `json:"status"`
+		Message      string `json:"message"`
+		Status       int    `json:"status"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 )

@@ -1,33 +1,90 @@
 package echo
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/mymhimself/ticket-system-api/internal/entity/enum"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
 	"github.com/mymhimself/ticket-system-api/internal/network/http/request"
+	"github.com/mymhimself/ticket-system-api/internal/network/http/response"
 	"net/http"
 )
 
-func (h *handler) newTicket(ctx echo.Context) error {
-	var ticketBody request.NewTicket
-	if err := ctx.Bind(&ticketBody); err != nil {
-		return &echo.HTTPError{
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
-		}
-	} else {
-		if err := h.validationService.NewTicketRequest(&ticketBody); err != nil {
-			return err
-		} else {
-			var ticket model.Ticket
-			ticket.Priority = enum.Priority(ticketBody.Priority)
-			ticket.Title = ticketBody.Title
-			ticket.Text = ticketBody.Text
-			ticket.Sender = ctx.Get("user").(model.User)
-			ticket.SenderID = 1
+func (h *handler) createNewTicket(ctx echo.Context) error {
+	var body request.NewTicket
 
-			//h.ticketService.SendTicketByUser()
+	if err := ctx.Bind(&body); err != nil {
+		fmt.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, response.Error{
+			Error:  "bad request format",
+			Status: http.StatusBadRequest,
+		})
+	} else {
+		//validation process
+		if err := h.validationService.NewTicketRequest(&body); err != nil {
+			return ctx.JSON(http.StatusBadRequest, response.Error{
+				Error:  err.Error(),
+				Status: http.StatusBadRequest,
+			})
+		} else {
+			//create ticket and call CreateNewTicket
+			var ticketThread model.TicketThread
+			ticketThread.Priority = enum.Priority(body.Priority)
+			ticketThread.Department = body.Department
+			ticketThread.Title = body.Title
+			ticketThread.Status = enum.Active
+			_, ticketThread.CreatorID = extractUserInfoFromToken(ctx)
+
+			if err := h.ticketService.CreateNewTicket(&ticketThread, body.Text); err != nil {
+				return ctx.JSON(http.StatusInternalServerError, response.Error{
+					Error:  err.Error(),
+					Status: http.StatusInternalServerError,
+				})
+			}
 		}
-		return nil
+		return ctx.JSON(
+			http.StatusOK,
+			response.NewTicket{
+				Message: "Ticket created and saved.",
+				Status:  http.StatusOK,
+			},
+		)
+	}
+}
+
+func (h *handler) replyToTicketMessage(ctx echo.Context) error {
+	var body request.ReplyTicket
+
+	//body extraction process
+	if err := ctx.Bind(&body); err != nil {
+		return ctx.JSON(http.StatusBadRequest, response.Error{
+			Error:  "bad request format",
+			Status: http.StatusBadRequest},
+		)
+	} else {
+		//validation process
+		if err := h.validationService.ReplyTicketRequest(&body); err != nil {
+			return ctx.JSON(http.StatusBadRequest, response.Error{
+				Error:  err.Error(),
+				Status: http.StatusBadRequest,
+			})
+		} else {
+			_, senderID := extractUserInfoFromToken(ctx)
+			err := h.ticketService.ReplyMessage(body.Text, body.ReplyTo, senderID)
+			if err != nil {
+				return ctx.JSON(http.StatusBadRequest, response.Error{
+					Error:  err.Error(),
+					Status: http.StatusBadRequest,
+				})
+			}
+
+		}
+		return ctx.JSON(
+			http.StatusOK,
+			response.NewTicket{
+				Message: "Message saved.",
+				Status:  http.StatusOK,
+			},
+		)
 	}
 }

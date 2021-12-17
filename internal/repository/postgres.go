@@ -16,9 +16,14 @@ type Postgres interface {
 	CheckUserExistence(username string) (bool, error)
 
 	//ticket relevant methods
-	SaveTicket(ticket *model.Ticket) error
-	SaveTicketReply(reply *model.Ticket) error
 	//load tickets for specific user and specific status type
-	LoadTickets(userID uint, status enum.TicketStatus) ([]model.Ticket, error)
-	LoadAllTickets(status enum.TicketStatus) ([]model.Ticket, error)
+	CreateNewTicketThread(firstMessage *model.TicketMessage) error
+	CreateMessage(ticketMessage *model.TicketMessage) error
+	CreateMessageWithReply(message *model.TicketMessage, repliedMessage *model.TicketMessage) error
+	UpdateMessage(ticketMessage *model.TicketMessage) error
+
+	UpdateTicket(reply *model.Ticket) error
+	GetUserTickets(userID uint, status enum.TicketThreadStatus) ([]model.Ticket, error)
+	GetAllTickets(status enum.TicketThreadStatus) ([]model.Ticket, error)
+	GetTicketMessageByID(id uint) (*model.TicketMessage, bool, error)
 }

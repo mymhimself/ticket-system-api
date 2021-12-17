@@ -18,6 +18,6 @@ func (h *handler) refreshToken(c echo.Context) error {
 	//	return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
 	//}
 	//
-	//return c.JSON(http.StatusOK, response.Login{Token: token, Status: http.StatusOK})
+	//return c.JSON(http.StatusOK, response.Login{AccessToken: token, Status: http.StatusOK})
 	return nil
 }

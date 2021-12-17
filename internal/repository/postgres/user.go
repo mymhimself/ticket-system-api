@@ -13,7 +13,7 @@ func (p *postgres) CreateUser(user *model.User) error {
 	result := p.db.Create(&user)
 	if result.Error != nil {
 		//database error
-		return result.Error
+		return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 	} else { //user data found
 		return nil
 	}
@@ -22,7 +22,7 @@ func (p *postgres) CreateUser(user *model.User) error {
 func (p *postgres) UpdateUser(user *model.User) error {
 	result := p.db.Save(user)
 	if result.Error != nil {
-		return result.Error
+		return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 	} else {
 		return nil
 	}
@@ -35,10 +35,10 @@ func (p *postgres) GetUserByID(id uint) (*model.User, error) {
 	if result.Error != nil {
 		//user data not found
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, result.Error
+			return nil, myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 			//database error
 		} else {
-			return nil, result.Error
+			return nil, myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 		}
 	} else { //user data found
 		return &user, nil
@@ -68,7 +68,7 @@ func (p *postgres) GetUserByUsername(username string) (*model.User, error) {
 func (p *postgres) DeleteUser(id uint) error {
 	result := p.db.Where(id).Delete(&model.User{})
 	if result.Error != nil {
-		return result.Error
+		return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 	} else {
 		return nil
 	}

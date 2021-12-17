@@ -9,8 +9,8 @@ import (
 
 func (s *validationImpl) LoginRequest(requestBody *request.Login) error {
 	err := validation.ValidateStruct(requestBody,
-		validation.Field(&requestBody.Username, validation.Required, is.Email),
-		validation.Field(&requestBody.Password, validation.Required, validation.Length(8, 30)),
+		validation.Field(&requestBody.Username, validation.Required),
+		validation.Field(&requestBody.Password, validation.Required),
 	)
 
 	return err
@@ -35,6 +35,16 @@ func (s *validationImpl) NewTicketRequest(requestBody *request.NewTicket) error 
 	err := validation.ValidateStruct(requestBody,
 		validation.Field(&requestBody.Text, validation.Required, validation.Length(10, 400)),
 		validation.Field(&requestBody.Title, validation.Required, validation.Length(10, 80)),
+		validation.Field(&requestBody.Priority, validation.Required, validation.Max(4), validation.Min(0)),
+		validation.Field(&requestBody.Department, validation.Required, validation.Min(1)),
+	)
+	return err
+}
+
+func (s *validationImpl) ReplyTicketRequest(requestBody *request.ReplyTicket) error {
+	err := validation.ValidateStruct(requestBody,
+		validation.Field(&requestBody.Text, validation.Required, validation.Length(10, 400)),
+		validation.Field(&requestBody.ReplyTo, validation.Required),
 	)
 
 	return err

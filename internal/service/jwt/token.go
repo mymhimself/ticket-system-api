@@ -8,32 +8,48 @@ import (
 	"time"
 )
 
-func (a jwtService) GenerateToken(user *model.User) (string, error) {
-	expireTime := time.Now().Add(time.Duration(a.cfg.TokenExpireTime) * time.Millisecond * 60)
+func (a jwtService) GenerateTokenPair(user *model.User) (string, string, error) {
+	accessTokenExpireTime := time.Now().Add(time.Duration(a.cfg.AccessTokenExpireTime) * time.Minute)
+	//initialize claim of access token
 	claim := model.TokenClaims{
 		ID:       user.Model.ID,
 		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireTime.Unix(),
+			ExpiresAt: accessTokenExpireTime.Unix(),
 		},
 	}
 
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	//initialize claim of refresh token
+	refreshTokenExpireTime := time.Now().Add(time.Duration(a.cfg.RefreshTokenExpireTime) * time.Minute)
+	rtClaim := model.RefreshTokenClaims{
+		ID: user.Model.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: refreshTokenExpireTime.Unix(),
+		},
+	}
 
-	signedToken, err := jwtToken.SignedString([]byte(a.cfg.Secret))
+	jwtAccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	signedAccessToken, err := jwtAccessToken.SignedString([]byte(a.cfg.Secret))
+
 	if err != nil {
 		a.logger.Error(err.Error())
-		return "", myerror.New(myerror.InternalError, enum.ServiceLayer, err.Error())
+		return "", "", myerror.New(myerror.InternalError, enum.ServiceLayer, err.Error())
 	} else {
-		return signedToken, nil
+		jwtRefreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaim)
+		signedRefreshToken, err := jwtRefreshToken.SignedString([]byte(a.cfg.Secret))
+		if err != nil {
+			a.logger.Error(err.Error())
+			return "", "", myerror.New(myerror.InternalError, enum.ServiceLayer, err.Error())
+		}
+
+		return signedAccessToken, signedRefreshToken, nil
 	}
 }
 
 func (a jwtService) GenerateRefreshToken(user *model.User) (string, error) {
-	expireTime := time.Now().Add(time.Duration(a.cfg.RefreshExpireTime) * time.Millisecond * 60)
-	claim := model.TokenClaims{
-		ID:       user.Model.ID,
-		Username: user.Username,
+	expireTime := time.Now().Add(time.Duration(a.cfg.RefreshTokenExpireTime) * time.Minute)
+	claim := model.RefreshTokenClaims{
+		ID: user.Model.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 		},

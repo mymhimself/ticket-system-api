@@ -6,8 +6,10 @@ import (
 )
 
 type Ticket interface {
-	SendTicketByUser(ticket *model.Ticket) error
-	LoadTicketByAdmin(status enum.TicketStatus) ([]model.Ticket, error)
-	LoadTicketByUser(status enum.TicketStatus, userID uint) ([]model.Ticket, error)
-	ReplyTicket(reply *model.Ticket) error
+	CreateNewTicket(ticket *model.TicketThread, text string) error
+	LoadTicketByAdmin(status enum.TicketThreadStatus) ([]model.Ticket, error)
+	LoadTicketByUser(status enum.TicketThreadStatus, userID uint) ([]model.Ticket, error)
+	GetTicketByID(ticketID uint) (*model.Ticket, error)
+	ReplyMessage(text string, repliedTicketID uint, senderID uint) error
+	UpdateTicket(ticket *model.Ticket) error
 }

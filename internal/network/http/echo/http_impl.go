@@ -39,15 +39,15 @@ func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account
 		ErrorHandler: func(err error) error {
 			return &echo.HTTPError{
 				Code:    http.StatusUnauthorized,
-				Message: http.StatusText(http.StatusUnauthorized),
+				Message: http.StatusText(http.StatusUnauthorized) + ". " + err.Error(),
 			}
 		},
 	}
-	//echoInstance.Use(middleware.JWTWithConfig(jwtConfig))
 
 	public := echoInstance.Group("")
 	admin := echoInstance.Group("/admin", middleware.JWTWithConfig(jwtConfig))
 	user := echoInstance.Group("/user", middleware.JWTWithConfig(jwtConfig))
+
 	var httpInstance = &httpImpl{
 		echo:   echoInstance,
 		public: public,

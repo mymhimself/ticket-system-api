@@ -1,8 +1,10 @@
 package service
 
-import "github.com/mymhimself/ticket-system-api/internal/entity/model"
+import (
+	"github.com/mymhimself/ticket-system-api/internal/entity/model"
+)
 
 type Authentication interface {
-	GenerateToken(user *model.User) (string, error)
+	GenerateTokenPair(user *model.User) (string, string, error)
 	GenerateRefreshToken(user *model.User) (string, error)
 }

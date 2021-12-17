@@ -2,26 +2,24 @@ package enum
 
 import "errors"
 
-type TicketStatus uint
+type TicketThreadStatus uint
 
 const (
-	Active = iota
-	All    //all status
-	Replied
+	Active TicketThreadStatus = iota
+	Suspend
 	Closed
-	Unread
 )
 
-var stringMap []string = []string{"active", "replied", "closed"}
+var stringMap []string = []string{"active", "closed"}
 
-func (s TicketStatus) String() string {
+func (s TicketThreadStatus) String() string {
 	return stringMap[s]
 }
 
-func (s *TicketStatus) UnmarshalText(b []byte) error {
+func (s *TicketThreadStatus) UnmarshalText(b []byte) error {
 	for i, v := range stringMap {
 		if v == string(b) {
-			*s = TicketStatus(i)
+			*s = TicketThreadStatus(i)
 			return nil
 		}
 	}
