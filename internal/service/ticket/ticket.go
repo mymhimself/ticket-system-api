@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+//CreateNewTicket create new thread push first message
 func (ts ticketImpl) CreateNewTicket(thread *model.TicketThread, text string) error {
 	var message model.TicketMessage
 	message.Text = text

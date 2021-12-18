@@ -1,0 +1,602 @@
+{
+	"info": {
+		"_postman_id": "2e918bfb-c584-43f5-833e-84d3c182932d",
+		"name": "ticket-system-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "ping",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"c@gmail.com\",\r\n    \"password\": \"asdfasdfasdf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/api/v1/ping",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"ping"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"mym@chmail.ir\",\r\n    \"password\":\"morteza123@aliY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/api/v1/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"mym@chmail.ir\",\r\n    \"password\":\"morteza123@aliY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/api/v1/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "register",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"mym@chmail.ir\",\r\n    \"password\":\"morteza123@aliY\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8081/api/v1/register",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"register"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "X-Request-Id",
+									"value": "OfRY4u6foS0Qq9JHvWb4dC72CsiKgQ5B"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Dec 2021 12:16:10 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "60"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"user exist\",\n    \"status\": 400\n}"
+						}
+					]
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "change ticket status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MSwiZXhwIjoxNjM5ODQ0OTg4fQ.yWMTfAT8TlnrtSt_adRRNLn6TWlKFuSLBDxu4Oxwo9o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"closed\",\r\n    \"ticket_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/admin/api/v1/ticket",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admin",
+								"api",
+								"v1",
+								"ticket"
+							]
+						},
+						"description": "change ticket status to closed or suspend"
+					},
+					"response": []
+				},
+				{
+					"name": "ticket detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MSwiZXhwIjoxNjM5ODQ2Mjk0fQ.kbFNNMbiND_aNf4BJKn_NfGFBEfuInQcSqi1veLeRYc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/admin/api/v1/ticket/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admin",
+								"api",
+								"v1",
+								"ticket",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reply",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MSwiZXhwIjoxNjM5ODQ2Mjk0fQ.kbFNNMbiND_aNf4BJKn_NfGFBEfuInQcSqi1veLeRYc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"fasdfreply to old message\",\r\n    \"reply_to\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/admin/api/v1/ticket",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admin",
+								"api",
+								"v1",
+								"ticket"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tickets",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MSwiZXhwIjoxNjM5ODQ3OTM3fQ.pDFBOZpYTEkLXdlJWjekBYfHdLcC-59h2VOeAEmxbCs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/admin/api/v1/tickets",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admin",
+								"api",
+								"v1",
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "department",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "replied",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "Active",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "create new ticket",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MCwiZXhwIjoxNjM5ODQyNTg4fQ.eCSAJ5AYu4i_94d0qW0swCLPlf4rI7cG0hXtS1KdAgE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"test title\",\r\n    \"text\": \"test ticket text\",\r\n    \"department\": 1,\r\n    \"priority\": \"low\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/user/api/v1/ticket",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"user",
+								"api",
+								"v1",
+								"ticket"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reply",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MCwiZXhwIjoxNjM5ODQyNTg4fQ.eCSAJ5AYu4i_94d0qW0swCLPlf4rI7cG0hXtS1KdAgE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"fasdfreply to old message\",\r\n    \"reply_to\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/user/api/v1/ticket",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"user",
+								"api",
+								"v1",
+								"ticket"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tickets",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MCwiZXhwIjoxNjM5ODQyNTg4fQ.eCSAJ5AYu4i_94d0qW0swCLPlf4rI7cG0hXtS1KdAgE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/user/api/v1/tickets",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"user",
+								"api",
+								"v1",
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "priority",
+									"value": "low",
+									"disabled": true
+								},
+								{
+									"key": "department",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "replied",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "Active",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJteW1AY2htYWlsLmlyIiwicm9sZSI6MCwiZXhwIjoxNjM5ODQyNTg4fQ.eCSAJ5AYu4i_94d0qW0swCLPlf4rI7cG0hXtS1KdAgE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/user/api/v1/ticket/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"user",
+								"api",
+								"v1",
+								"ticket",
+								"1"
+							]
+						},
+						"description": "this reqiest show all detils of ticket threads and its messages"
+					},
+					"response": [
+						{
+							"name": "ticket detail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8081/user/api/v1/ticket/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"user",
+										"api",
+										"v1",
+										"ticket",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "X-Request-Id",
+									"value": "2G0oD004ZnzPDrI8CiatsBBmLHXLk3Cs"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Dec 2021 12:31:46 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "221"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": 200,\n    \"ticket\": {\n        \"thread\": {\n            \"title\": \"test title\",\n            \"priority\": 1,\n            \"closed_time\": \"0001-01-01T03:30:00+03:30\",\n            \"status\": 0,\n            \"creator_id\": 1,\n            \"department\": 1,\n            \"assigned_to_admin_id\": null\n        },\n        \"messages\": [\n            {\n                \"text\": \"test ticket text\",\n                \"seen\": false,\n                \"sender_id\": 1,\n                \"replied\": false,\n                \"reply_to\": 0\n            },\n            {\n                \"text\": \"reply to old message\",\n                \"seen\": false,\n                \"sender_id\": 1,\n                \"replied\": false,\n                \"reply_to\": 2\n            },\n            {\n                \"text\": \"reply to old message\",\n                \"seen\": false,\n                \"sender_id\": 1,\n                \"replied\": false,\n                \"reply_to\": 2\n            },\n            {\n                \"text\": \"reply to old message\",\n                \"seen\": false,\n                \"sender_id\": 1,\n                \"replied\": false,\n                \"reply_to\": 2\n            }\n        ]\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
