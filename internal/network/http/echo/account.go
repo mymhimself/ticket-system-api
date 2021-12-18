@@ -17,45 +17,63 @@ type handler struct {
 	validationService     service.Validation
 }
 
-func (h *handler) login(c echo.Context) error {
+func (h *handler) login(ctx echo.Context) error {
 	var req request.Login
 
-	if err := c.Bind(&req); err != nil {
+	if err := ctx.Bind(&req); err != nil {
 		h.logger.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest},
+		)
 	}
 
 	if err := h.validationService.LoginRequest(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		})
 	}
 
 	token, refreshToken, err := h.accountService.Login(req.Username, req.Password)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest},
+		)
 	}
 
-	return c.JSON(http.StatusOK, response.Login{RefreshToken: refreshToken, AccessToken: token, Status: http.StatusOK})
+	return ctx.JSON(http.StatusOK, response.Login{RefreshToken: refreshToken, AccessToken: token, Status: http.StatusOK})
 }
 
-func (h *handler) register(c echo.Context) error {
+func (h *handler) register(ctx echo.Context) error {
 	var req request.Register
 
-	if err := c.Bind(&req); err != nil {
+	if err := ctx.Bind(&req); err != nil {
 		h.logger.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		})
 	}
 
 	if err := h.validationService.RegisterRequest(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest})
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest},
+		)
 	}
 
 	accessToken, refreshToken, err := h.accountService.Register(req.Username, req.Password)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, response.Error{Error: err.Error(), Status: http.StatusBadRequest}) // i know can better error handling
+		return ctx.JSON(http.StatusBadRequest, response.Message{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		})
 	}
 
-	return c.JSON(http.StatusOK, response.Register{
-		Message:      "User Successfully Registered",
+	return ctx.JSON(http.StatusOK, response.Register{
+		Message:      "user successfully registered",
 		Status:       200,
 		RefreshToken: refreshToken,
 		AccessToken:  accessToken,

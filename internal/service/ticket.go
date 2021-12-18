@@ -9,9 +9,10 @@ type Ticket interface {
 	CreateNewTicket(ticket *model.TicketThread, text string) error
 	LoadTicketByAdmin(status enum.TicketThreadStatus) ([]model.Ticket, error)
 	LoadTicketByUser(status enum.TicketThreadStatus, userID uint) ([]model.Ticket, error)
-	GetTicketByID(ticketID uint) (*model.Ticket, error)
+	GetTicketByID(ticketID uint) (*model.Ticket, bool, error)
 	ReplyMessage(text string, repliedTicketID uint, senderID uint) error
-	ReplyMessageAsAdmin(text string, repliedTicketID uint, senderID uint) error
-	UpdateTicket(ticket *model.Ticket) error
-	GetFilteredTicketThreads(creatorID uint, seen *bool, status *int64, replied *bool, priority *int64, department *int64) ([]model.TicketInfo, error)
+	ReplyMessageByAdmin(text string, repliedTicketID uint, senderID uint) error
+	UpdateTicketMessage(ticket *model.TicketMessage) error
+	GetFilteredTicketThreads(creatorID *uint, seen *bool, status *enum.TicketThreadStatus, replied *bool, priority *enum.Priority, department *int64) ([]model.TicketInfo, error)
+	ChangeTicketStatus(ticketID uint, status enum.TicketThreadStatus) error
 }

@@ -6,5 +6,4 @@ import (
 
 type Authentication interface {
 	GenerateTokenPair(user *model.User) (string, string, error)
-	GenerateRefreshToken(user *model.User) (string, error)
 }

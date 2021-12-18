@@ -53,7 +53,7 @@ func startServer(c *cli.Context) error {
 	//instantiate a validation service
 	validationServiceInstance := validation.New(loggerInstance)
 	//instantiate a http server that implemented with echo framework
-	httpServiceInstance := echo.New(cfg.Authentication, loggerInstance, accountServiceInstance, ticketServiceInstance, validationServiceInstance)
+	httpServiceInstance := echo.New(cfg.Authentication, cfg.Authorization, loggerInstance, accountServiceInstance, ticketServiceInstance, validationServiceInstance)
 
 	//run http server in new goroutine
 	go func() {

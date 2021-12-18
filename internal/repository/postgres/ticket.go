@@ -33,13 +33,16 @@ func (p *postgres) CreateMessageWithReply(message *model.TicketMessage, repliedM
 	tx := p.db.Begin()
 	result := tx.Create(message)
 	if result.Error != nil {
+		p.logger.Error(result.Error.Error())
 		return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 	} else {
+		fmt.Println(repliedMessage)
 		result = tx.Save(repliedMessage)
 		if result.Error != nil {
 			tx.Rollback()
+			p.logger.Error(result.Error.Error())
 			return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
-		} else {
+		} else { //both saved
 			tx.Commit()
 			return nil
 		}
@@ -76,8 +79,8 @@ func (p *postgres) GetAllTickets(status enum.TicketThreadStatus) ([]model.Ticket
 	}
 }
 
-func (p *postgres) UpdateTicket(ticket *model.Ticket) error {
-	result := p.db.Create(ticket)
+func (p *postgres) UpdateTicketThread(ticket *model.TicketThread) error {
+	result := p.db.Save(ticket)
 	if result.Error != nil {
 		return myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 	} else {
@@ -115,15 +118,19 @@ func (p *postgres) GetOpenTicketThreadsList() ([]model.TicketThread, error) {
 	}
 }
 
-func (p *postgres) GetUserTicketThreadListByFilter(userID uint, filterParams map[string]interface{}) ([]model.TicketInfo, error) {
+func (p *postgres) GetUserTicketThreadListByFilter(userID *uint, filterParams map[string]interface{}) ([]model.TicketInfo, error) {
 	var list []model.TicketInfo
 	var conditions []string
 
-	query := fmt.Sprintf(QryTicketInfoFilter, userID)
+	senderCondition := ""
+	if userID != nil {
+		senderCondition = fmt.Sprintf("and tm.sender_id = %d", *userID)
+	}
+	query := fmt.Sprintf(QryTicketInfoFilter, senderCondition)
 	for k, v := range filterParams {
 		switch k {
 		case "status":
-			conditions = append(conditions, fmt.Sprintf("status = %d", v.(int64)))
+			conditions = append(conditions, fmt.Sprintf("status = %d", v.(enum.TicketThreadStatus)))
 		case "department":
 			conditions = append(conditions, fmt.Sprintf("department = %d", v.(int64)))
 		case "seen":
@@ -131,13 +138,13 @@ func (p *postgres) GetUserTicketThreadListByFilter(userID uint, filterParams map
 		case "replied":
 			conditions = append(conditions, fmt.Sprintf("bool(is_replied) = %v", v.(bool)))
 		case "priority":
-			conditions = append(conditions, fmt.Sprintf("priority = %d", v.(int64)))
+			conditions = append(conditions, fmt.Sprintf("priority = %d", v.(enum.Priority)))
 		}
 	}
 	if len(conditions) != 0 {
 		query = query + " where " + strings.Join(conditions, " and ")
 	}
-	fmt.Println(query)
+	//fmt.Println(query)
 
 	res := p.db.Raw(query).Find(&list)
 	if res.Error != nil {
@@ -149,4 +156,29 @@ func (p *postgres) GetUserTicketThreadListByFilter(userID uint, filterParams map
 
 func (p *postgres) GetAdminTicketThreadsList(adminID uint) {
 
+}
+
+func (p *postgres) GetTicketThreadByID(ticketID uint) (*model.TicketThread, bool, error) {
+	var ticket model.TicketThread
+	res := p.db.Where(ticketID).First(&ticket)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil, false, nil
+		} else {
+			p.logger.Error(res.Error.Error())
+			return nil, false, myerror.New(myerror.InternalError, enum.RepoLayer, res.Error.Error())
+		}
+	} else {
+		return &ticket, true, nil
+	}
+}
+
+func (p *postgres) GetTicketMessageByThreadID(threadID uint) ([]model.TicketMessage, error) {
+	var messages []model.TicketMessage
+	res := p.db.Where(model.TicketMessage{ThreadID: threadID}).Find(&messages)
+	if res.Error != nil {
+		return nil, myerror.New(myerror.InternalError, enum.RepoLayer, res.Error.Error())
+	} else {
+		return messages, nil
+	}
 }

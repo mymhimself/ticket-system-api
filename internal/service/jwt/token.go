@@ -14,6 +14,7 @@ func (a jwtService) GenerateTokenPair(user *model.User) (string, string, error) 
 	claim := model.TokenClaims{
 		ID:       user.Model.ID,
 		Username: user.Username,
+		Role:     user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: accessTokenExpireTime.Unix(),
 		},
@@ -43,23 +44,5 @@ func (a jwtService) GenerateTokenPair(user *model.User) (string, string, error) 
 		}
 
 		return signedAccessToken, signedRefreshToken, nil
-	}
-}
-
-func (a jwtService) GenerateRefreshToken(user *model.User) (string, error) {
-	expireTime := time.Now().Add(time.Duration(a.cfg.RefreshTokenExpireTime) * time.Minute)
-	claim := model.RefreshTokenClaims{
-		ID: user.Model.ID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireTime.Unix(),
-		},
-	}
-
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodES256, claim)
-	signedToken, err := jwtToken.SignedString(a.cfg.Secret)
-	if err != nil {
-		return "", err
-	} else {
-		return signedToken, nil
 	}
 }

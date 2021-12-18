@@ -45,23 +45,22 @@ func (p *postgres) GetUserByID(id uint) (*model.User, error) {
 	}
 }
 
-func (p *postgres) GetUserByUsername(username string) (*model.User, error) {
+func (p *postgres) GetUserByUsername(username string) (*model.User, bool, error) {
 	var user model.User
 	//searching user data in database
 	result := p.db.Where(model.User{Username: username}).First(&user)
 	if result.Error != nil {
 		//user data not found
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			err := myerror.New(myerror.UserNotFound, enum.RepoLayer, result.Error.Error())
-			return nil, err
+			return nil, false, nil
 			//database error
 		} else {
 			err := myerror.New(myerror.InternalError, enum.RepoLayer, result.Error.Error())
 			p.logger.Error(err.Code.String(), err)
-			return nil, err
+			return nil, false, err
 		}
 	} else { //user data found
-		return &user, nil
+		return &user, true, nil
 	}
 }
 

@@ -1,9 +1,10 @@
 package ticket
 
 import (
+	"errors"
 	"github.com/mymhimself/ticket-system-api/internal/entity/enum"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
-	"github.com/mymhimself/ticket-system-api/internal/pkg/myerror"
+	"time"
 )
 
 func (ts ticketImpl) CreateNewTicket(thread *model.TicketThread, text string) error {
@@ -34,15 +35,15 @@ func (ts ticketImpl) ReplyMessage(text string, repliedMessageID uint, senderID u
 		return err
 	} else if !exist {
 		//ticket message not found
-		return myerror.New(myerror.TicketMessageNotFound, enum.ServiceLayer, "")
+		return errors.New(MessageNotFound)
 	}
 	//another creator
 	if repliedMessage.Thread.CreatorID != senderID {
-		return myerror.New(myerror.TicketNotFound, enum.ServiceLayer, "")
+		return errors.New(MessageNotFound)
 	}
 	//ticket is closed
 	if repliedMessage.Thread.Status == enum.Closed {
-		return myerror.New(myerror.TicketMessageNotFound, enum.ServiceLayer, "")
+		return errors.New(ClosedTicket)
 	}
 
 	var newMessage model.TicketMessage
@@ -58,18 +59,16 @@ func (ts ticketImpl) ReplyMessage(text string, repliedMessageID uint, senderID u
 	return nil
 }
 
-func (ts ticketImpl) ReplyMessageAsAdmin(text string, repliedMessageID uint, senderID uint) error {
+func (ts ticketImpl) ReplyMessageByAdmin(text string, repliedMessageID uint, senderID uint) error {
 	repliedMessage, exist, err := ts.postgres.GetTicketMessageByID(repliedMessageID)
 	if err != nil {
 		return err
 	} else if !exist {
-		return myerror.New(myerror.TicketMessageNotFound, enum.ServiceLayer, "")
-	}
-	if repliedMessage.Thread.AssignedToAdminID != &senderID {
-		return myerror.New(myerror.TicketMessageNotFound, enum.ServiceLayer, "")
+		return errors.New(MessageNotFound)
 	}
 
 	var newMessage model.TicketMessage
+	newMessage.SenderID = senderID
 	newMessage.ReplyTo = repliedMessage.ID
 	newMessage.ThreadID = repliedMessage.ThreadID
 	newMessage.Text = text
@@ -79,19 +78,31 @@ func (ts ticketImpl) ReplyMessageAsAdmin(text string, repliedMessageID uint, sen
 	if err := ts.postgres.CreateMessageWithReply(&newMessage, repliedMessage); err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (ts ticketImpl) UpdateTicket(ticket *model.Ticket) error {
-	return nil
+func (ts ticketImpl) UpdateTicketMessage(ticket *model.TicketMessage) error {
+	return ts.postgres.UpdateMessage(ticket)
 }
 
-func (ts ticketImpl) GetTicketByID(id uint) (*model.Ticket, error) {
-	return nil, nil
+func (ts ticketImpl) GetTicketByID(id uint) (*model.Ticket, bool, error) {
+	thread, exist, err := ts.postgres.GetTicketThreadByID(id)
+	if err != nil {
+		return nil, false, err
+	} else if !exist {
+		return nil, false, nil
+	}
+	messages, err := ts.postgres.GetTicketMessageByThreadID(thread.ID)
+	if err != nil {
+		return nil, false, err
+	}
+	var ticket model.Ticket
+	ticket.Thread = *thread
+	ticket.Messages = messages
+	return &ticket, true, nil
 }
 
-func (ts ticketImpl) GetFilteredTicketThreads(creatorID uint, seen *bool, status *int64, replied *bool, priority *int64, department *int64) ([]model.TicketInfo, error) {
+func (ts ticketImpl) GetFilteredTicketThreads(creatorID *uint, seen *bool, status *enum.TicketThreadStatus, replied *bool, priority *enum.Priority, department *int64) ([]model.TicketInfo, error) {
 	var filterMap = make(map[string]interface{})
 	if seen != nil {
 		filterMap["seen"] = *seen //
@@ -113,5 +124,20 @@ func (ts ticketImpl) GetFilteredTicketThreads(creatorID uint, seen *bool, status
 		return nil, err
 	} else {
 		return list, nil
+	}
+}
+
+func (ts ticketImpl) ChangeTicketStatus(ticketID uint, status enum.TicketThreadStatus) error {
+	ticket, exist, err := ts.postgres.GetTicketThreadByID(ticketID)
+	if err != nil {
+		return err
+	} else if !exist {
+		return errors.New(NotFoundTicket)
+	} else {
+		ticket.Status = status
+		if ticket.Status == enum.Closed {
+			ticket.ClosedTime = time.Now()
+		}
+		return ts.postgres.UpdateTicketThread(ticket)
 	}
 }

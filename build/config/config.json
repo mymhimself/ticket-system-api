@@ -5,12 +5,12 @@
     },
     "authorization": {
       "casbin": {
-        "model_path": "casbin/casbin_auth_policy.csv",
-        "policy_path": "casbin/casbin_auth_model.conf"
+        "model_path": "build/casbin/policy.csv",
+        "policy_path": "build/casbin/model.conf"
       }
     },
     "authentication": {
-      "secret": "alskdjfal87sdjXfaweoUIO8324798",
+      "secret": "jwt@secret1400",
       "access_token_expire_time": 10,
       "refresh_token_expire_time": 43200
     },

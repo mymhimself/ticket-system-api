@@ -1,6 +1,9 @@
 package enum
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type Priority int64
 
@@ -15,7 +18,7 @@ func (p Priority) String() string {
 	if val, ok := priorityStringMap[p]; ok {
 		return val
 	}
-	return stringMap[PriorityLevelLow]
+	return ticketStatusStringMap[PriorityLevelLow]
 }
 
 func IsValidValue(priority uint) bool {
@@ -32,10 +35,14 @@ var priorityStringMap map[Priority]string = map[Priority]string{
 
 func (s *Priority) UnmarshalText(b []byte) error {
 	for i, v := range priorityStringMap {
-		if v == string(b) {
+		if strings.ToLower(v) == strings.ToLower(string(b)) {
 			*s = Priority(i)
 			return nil
 		}
 	}
 	return errors.New("invalid priority value")
+}
+
+func (p Priority) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
 }

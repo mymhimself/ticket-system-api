@@ -2,7 +2,9 @@ package echo
 
 import (
 	"context"
+	"fmt"
 	"github.com/mymhimself/ticket-system-api/internal/config"
+	"github.com/mymhimself/ticket-system-api/internal/entity/enum"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
 	"github.com/mymhimself/ticket-system-api/internal/network"
 	"github.com/mymhimself/ticket-system-api/internal/pkg/logger"
@@ -22,13 +24,17 @@ type httpImpl struct { //REST
 	user    *echo.Group
 }
 
-func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account, ticketSrv service.Ticket, validation service.Validation) network.Rest {
+func New(cfg config.Authentication, authorizationCfg config.Authorization, logger logger.Logger, accSrv service.Account, ticketSrv service.Ticket, validation service.Validation) network.Rest {
 	echoInstance := echo.New()
-	//enforcer, _ := casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")
+	//enforcer, err := casbin.NewEnforcer(authorizationCfg.Casbin.ModelPath, authorizationCfg.Casbin.PolicyPath)
+	//if err != nil {
+	//	log.Fatal("casbin file loader error.\n", err.Error())
+	//}
 	//echoInstance.Use(casbinMw.Middleware(enforcer))
 	echoInstance.Use(middleware.Gzip())
 	echoInstance.Use(middleware.RequestID())
 	echoInstance.Use(middleware.Recover())
+	echoInstance.Use(middleware.Secure())
 	echoInstance.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete},
@@ -37,15 +43,16 @@ func New(cfg config.Authentication, logger logger.Logger, accSrv service.Account
 		SigningKey: []byte(cfg.Secret),
 		Claims:     &model.TokenClaims{},
 		ErrorHandler: func(err error) error {
+			fmt.Println(err.Error())
 			return &echo.HTTPError{
 				Code:    http.StatusUnauthorized,
-				Message: http.StatusText(http.StatusUnauthorized) + ". " + err.Error(),
+				Message: http.StatusText(http.StatusUnauthorized),
 			}
 		},
 	}
 
 	public := echoInstance.Group("")
-	admin := echoInstance.Group("/admin", middleware.JWTWithConfig(jwtConfig))
+	admin := echoInstance.Group("/admin", middleware.JWTWithConfig(jwtConfig), accessControl(enum.Admin))
 	user := echoInstance.Group("/user", middleware.JWTWithConfig(jwtConfig))
 
 	var httpInstance = &httpImpl{

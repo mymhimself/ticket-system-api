@@ -4,10 +4,10 @@ const (
 	QryTicketInfoFilter = `with tmp as(
 							select distinct tt.*, 
 							tm.sender_id, 
-							min(case when tm.seen  then 1 else 0 end) over () is_seen, 
-							min(case when tm.replied then 1 else 0 end) over () is_replied
+							min(case when tm.seen  then 1 else 0 end) over (PARTITION by thread_id) is_seen, 
+							min(case when tm.replied then 1 else 0 end) over (PARTITION by thread_id) is_replied
 							from ticket_threads tt, ticket_messages tm
-							where tt.deleted_at is null and tt.id = tm.thread_id and tm.sender_id = %d)
+							where tt.deleted_at is null and tt.id = tm.thread_id %s)
 							select 
 							id, 
 							sender_id, 

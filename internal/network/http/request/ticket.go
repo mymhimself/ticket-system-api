@@ -1,11 +1,13 @@
 package request
 
+import "github.com/mymhimself/ticket-system-api/internal/entity/enum"
+
 type (
 	NewTicket struct {
-		Title      string `json:"title"`
-		Text       string `json:"text"`
-		Priority   int64  `json:"priority"`
-		Department int64  `json:"department"`
+		Title      string        `json:"title"`
+		Text       string        `json:"text"`
+		Priority   enum.Priority `json:"priority"`
+		Department int64         `json:"department"`
 	}
 
 	ReplyTicket struct {
@@ -17,8 +19,13 @@ type (
 		Seen    *bool `param:"seen" query:"seen" form:"seen"`
 		Replied *bool `param:"replied" query:"replied"`
 
-		Status     *int64 `param:"status" query:"status"` //0=active, 2=closed, 1=suspend
-		Department *int64 `param:"department" query:"department"`
-		Priority   *int64 `param:"priority" query:"priority"`
+		Status     *enum.TicketThreadStatus `param:"status" query:"status"` //0=active, closed, suspend
+		Department *int64                   `param:"department" query:"department"`
+		Priority   *enum.Priority           `param:"priority" query:"priority"`
+	}
+
+	ChangeTicketStatus struct {
+		Status   enum.TicketThreadStatus `json:"status"`
+		TicketID uint                    `json:"ticket_id"`
 	}
 )

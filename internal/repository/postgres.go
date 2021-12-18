@@ -11,7 +11,7 @@ type Postgres interface {
 	CreateUser(user *model.User) error
 	UpdateUser(user *model.User) error
 	GetUserByID(id uint) (*model.User, error)
-	GetUserByUsername(username string) (*model.User, error)
+	GetUserByUsername(username string) (*model.User, bool, error)
 	DeleteUser(id uint) error
 	CheckUserExistence(username string) (bool, error)
 
@@ -22,10 +22,13 @@ type Postgres interface {
 	CreateMessageWithReply(message *model.TicketMessage, repliedMessage *model.TicketMessage) error
 	UpdateMessage(ticketMessage *model.TicketMessage) error
 
-	UpdateTicket(reply *model.Ticket) error
+	UpdateTicketThread(ticket *model.TicketThread) error
 	GetUserTickets(userID uint, status enum.TicketThreadStatus) ([]model.Ticket, error)
 	GetAllTickets(status enum.TicketThreadStatus) ([]model.Ticket, error)
 	GetTicketMessageByID(id uint) (*model.TicketMessage, bool, error)
 	GetOpenTicketThreadsList() ([]model.TicketThread, error)
-	GetUserTicketThreadListByFilter(userID uint, filterParams map[string]interface{}) ([]model.TicketInfo, error)
+	GetUserTicketThreadListByFilter(userID *uint, filterParams map[string]interface{}) ([]model.TicketInfo, error)
+	GetTicketThreadByID(ticketID uint) (*model.TicketThread, bool, error)
+	GetTicketMessageByThreadID(threadID uint) ([]model.TicketMessage, error)
+	//UpdateTicketThreadStatus(ticketID uint, status uint) error
 }

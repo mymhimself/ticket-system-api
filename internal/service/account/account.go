@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"github.com/mymhimself/ticket-system-api/internal/entity/enum"
 	"github.com/mymhimself/ticket-system-api/internal/entity/model"
 	"github.com/mymhimself/ticket-system-api/internal/pkg/myerror"
@@ -9,14 +10,16 @@ import (
 func (a *accountService) Login(username, password string) (string, string, error) {
 	// start span with context
 
-	user, err := a.postgres.GetUserByUsername(username)
+	user, exist, err := a.postgres.GetUserByUsername(username)
 	if err != nil {
 		return "", "", err
+	} else if !exist {
+		return "", "", errors.New(UserNotFound)
 	}
 
 	match := comparePassword(password, user.HashedPassword, user.Salt)
 	if !match {
-		return "", "", myerror.New(myerror.PasswordIncorrect, enum.ServiceLayer, "")
+		return "", "", errors.New(IncorrectPassword)
 	} else {
 		token, refreshToken, err := a.Authentication.GenerateTokenPair(user)
 		return token, refreshToken, err
@@ -30,7 +33,7 @@ func (a *accountService) Register(username, password string) (string, string, er
 		return "", "", err
 	}
 	if exists {
-		return "", "", myerror.New(myerror.UserExists, enum.ServiceLayer, "")
+		return "", "", errors.New(UserExists)
 	}
 
 	user.Username = username
